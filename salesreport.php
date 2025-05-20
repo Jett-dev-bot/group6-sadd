@@ -1,7 +1,6 @@
 <?php
 include 'db.php';
 
-// Query to get sales data by joining orders and order_items
 $query = "
     SELECT o.id AS order_id, o.order_date, oi.menu_item_id, oi.quantity, oi.price, m.name AS item_name, m.image_path 
     FROM orders o
@@ -11,7 +10,6 @@ $query = "
 ";
 $stmt = $pdo->query($query);
 $salesData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 ?>
 
 <!DOCTYPE html>
@@ -20,111 +18,90 @@ $salesData = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sales Report</title>
-  <style>
-    /* Styles */
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: #066b72; color: white; }
-    .sidebar { width: 80px; background-color: #055a61; height: 100vh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
-    .sidebar img, .sidebar div { margin: 20px 0; font-size: 12px; text-align: center; cursor: pointer; }
-    .current { background-color: #42c5c6; color: black; padding: 10px; border-radius: 10px; width: 100%; text-align: center; }
-    .topbar { margin-left: 80px; padding: 20px; display: flex; justify-content: space-between; align-items: center; background-color: #066b72; }
-    .topbar h2 { background-color: white; color: black; padding: 8px 15px; border-radius: 10px; }
-    .topbar nav { display: flex; gap: 20px; }
-    .topbar nav a { color: white; text-decoration: none; font-weight: bold; }
-    .content { margin-left: 100px; padding: 20px; }
-    .table-header, .table-row { display: grid; grid-template-columns: 1fr 3fr 1fr 1fr 1fr 1fr; gap: 10px; padding: 10px; border-radius: 6px; align-items: center; }
-    .table-header { background-color: #338f97; font-weight: bold; margin-bottom: 10px; }
-    .table-row { background-color: #2c2c2c; margin-bottom: 10px; }
-    .product-info { display: flex; align-items: center; }
-    .product-image { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; margin-right: 10px; }
-    .product-details h4 { margin: 0; }
-    .product-details p { margin: 0; font-size: 12px; color: #90ee90; }
-    .actions { display: flex; gap: 10px; }
-    .actions button { background: none; border: none; cursor: pointer; font-size: 16px; color: white; }
-    .actions button.delete { color: red; }
-    .grand-total { display: flex; justify-content: flex-end; margin-top: 20px; }
-    .grand-total button { background-color: #42c5c6; border: none; padding: 10px 20px; border-radius: 8px; color: white; font-weight: bold; font-size: 16px; }
-  </style>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
 </head>
-<body>
+<body class="bg-gray-900 text-white font-sans">
 
-<div class="sidebar">
-  <a href="menu.php" style="text-decoration: none; color: white;">
-    <div><strong>MENU</strong></div>
-  </a>
-  <div class="current"><strong>SALES REPORT</strong></div>
-  <div><strong>ORDERS</strong></div>
-  <div><strong>SETTINGS</strong></div>
-</div>
+  <!-- Sidebar -->
+  <aside class="fixed top-0 left-0 w-64 h-screen bg-teal-900 shadow-lg p-6">
+    <h1 class="text-2xl font-bold mb-8">QuickSales</h1>
+    <nav class="space-y-4">
+      <a href="menu.php" class="block hover:underline">📋 Menu</a>
+      <a href="salesreport.php" class="block font-semibold underline text-yellow-300">📊 Sales Report</a>
+      <a href="dashboard.php" class="block hover:underline">📈 Dashboard</a>
+      <a href="profile.php" class="block hover:underline">👤 Profile</a>
+    </nav>
+  </aside>
 
-<div class="topbar">
-  <h2>QUICK SALES</h2>
-  <nav>
-    <a href="#">HOME</a>
-    <a href="#">ABOUT US</a>
-  </nav>
-</div>
+  <!-- Main Content -->
+  <main class="ml-64 p-6">
+    
+    <!-- Topbar -->
+    <header class="bg-teal-800 p-4 rounded-lg mb-6 flex justify-between items-center">
+      <h2 class="text-xl font-bold">Sales Report</h2>
+    </header>
 
-<div class="content">
-  <div class="table-header">
-    <span>Order No.</span>
-    <span>Product</span>
-    <span>Quantity</span>
-    <span>Price</span>
-    <span>Actions</span>
-  </div>
+    <!-- Sales Table -->
+    <section class="bg-gray-800 p-6 rounded-lg shadow">
+      <div class="grid grid-cols-5 font-semibold text-sm border-b border-gray-600 pb-2 mb-4">
+        <div>Order No.</div>
+        <div>Product</div>
+        <div>Quantity</div>
+        <div>Price</div>
+        <div>Actions</div>
+      </div>
 
-  <div id="sales-list">
-    <!-- PHP will populate this -->
-    <?php
-    $total = 0;
-    foreach ($salesData as $item) {
-      $itemTotal = $item['price'] * $item['quantity'];
-      $total += $itemTotal;
-      echo "
-        <div class='table-row'>
-          <div>#{$item['order_id']}</div>
-          <div class='product-info'>
-            <img src='{$item['image_path']}' alt='{$item['item_name']}' class='product-image'/>
-            <div class='product-details'>
-              <h4>{$item['item_name']}</h4>
-              <p>Price: ₱{$item['price']}</p>
+      <?php
+      $total = 0;
+      foreach ($salesData as $item):
+        $itemTotal = $item['price'] * $item['quantity'];
+        $total += $itemTotal;
+      ?>
+        <div class="grid grid-cols-5 items-center mb-4 bg-gray-700 p-3 rounded">
+          <div>#<?= $item['order_id'] ?></div>
+          <div class="flex items-center gap-4">
+            <img src="<?= $item['image_path'] ?>" alt="<?= $item['item_name'] ?>" class="w-14 h-14 rounded object-cover">
+            <div>
+              <p class="font-bold text-sm"><?= $item['item_name'] ?></p>
+              <p class="text-green-300 text-xs">₱<?= number_format($item['price'], 2) ?></p>
             </div>
           </div>
-          <div>{$item['quantity']}</div>
-          <div>₱{$itemTotal}</div>
-          <div class='actions'>
-            <button class='edit'>✏️</button>
-            <button class='delete' onclick='deleteItem({$item['order_id']})'>🗑️</button>
+          <div><?= $item['quantity'] ?></div>
+          <div>₱<?= number_format($itemTotal, 2) ?></div>
+          <div class="space-x-2 text-lg">
+            <button title="Edit">✏️</button>
+            <button class="text-red-400" onclick="deleteItem(<?= $item['order_id'] ?>)" title="Delete">🗑️</button>
           </div>
         </div>
-      ";
-    }
-    ?>
-  </div>
+      <?php endforeach; ?>
+    </section>
 
-  <div class="grand-total">
-    <button id="totalPrice">Total Grand Price: ₱<?= number_format($total, 2) ?></button>
-  </div>
-</div>
+    <!-- Total -->
+    <div class="mt-6 text-right">
+      <span class="bg-yellow-300 text-gray-900 font-bold px-6 py-3 rounded inline-block text-lg">
+        Total Grand Price: ₱<?= number_format($total, 2) ?>
+      </span>
+    </div>
 
-<script>
-  function deleteItem(orderId) {
-    if (confirm('Are you sure you want to delete this order?')) {
-      fetch(`delete_order.php?id=${orderId}`, { method: 'GET' })
-        .then(res => res.json())
-        .then(data => {
-          if (data.status === 'success') {
-            alert('Order deleted!');
-            location.reload(); // Refresh the page
-          } else {
-            alert('Failed to delete the order.');
-          }
-        })
-        .catch(err => alert('Error: ' + err));
+  </main>
+
+  <script>
+    function deleteItem(orderId) {
+      if (confirm('Are you sure you want to delete this order?')) {
+        fetch(`delete_order.php?id=${orderId}`, { method: 'GET' })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === 'success') {
+              alert('Order deleted!');
+              location.reload();
+            } else {
+              alert('Failed to delete the order.');
+            }
+          })
+          .catch(err => alert('Error: ' + err));
+      }
     }
-  }
-</script>
+  </script>
 
 </body>
 </html>

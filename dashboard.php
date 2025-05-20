@@ -1,3 +1,45 @@
+<?php
+include 'db.php';
+
+// Total Sales
+$stmtSales = $pdo->query("SELECT SUM(oi.quantity * oi.price) AS total_sales FROM order_items oi");
+$totalSales = $stmtSales->fetchColumn() ?? 0;
+
+// Total Orders
+$stmtOrders = $pdo->query("SELECT COUNT(DISTINCT id) FROM orders");
+$totalOrders = $stmtOrders->fetchColumn() ?? 0;
+
+// Items in Stock
+$stmtStock = $pdo->query("SELECT SUM(stock) FROM menu_items");
+$totalStock = $stmtStock->fetchColumn() ?? 0;
+
+// Weekly Sales Data (Past 7 Days)
+$stmtWeekly = $pdo->query("
+    SELECT DATE(order_date) as day, SUM(oi.quantity * oi.price) AS daily_total
+    FROM orders o
+    JOIN order_items oi ON o.id = oi.order_id
+    WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+    GROUP BY DATE(order_date)
+    ORDER BY day
+");
+$weeklyData = $stmtWeekly->fetchAll(PDO::FETCH_ASSOC);
+
+// Prepare chart data
+$days = [];
+$totals = [];
+$weekMap = [];
+
+foreach ($weeklyData as $row) {
+    $weekMap[$row['day']] = $row['daily_total'];
+}
+
+for ($i = 6; $i >= 0; $i--) {
+    $date = date('Y-m-d', strtotime("-$i days"));
+    $days[] = date('D', strtotime($date));
+    $totals[] = $weekMap[$date] ?? 0;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,8 +57,8 @@
     <nav class="space-y-4">
       <a href="menu.php" class="block hover:underline">📋 Menu</a>
       <a href="salesreport.php" class="block hover:underline">📊 Sales Report</a>
-      <a href="#" class="block font-semibold underline">📈 Dashboard</a>
-      <a href="#" class="block hover:underline">⚙️ Settings</a>
+      <a href="dashboard.php" class="block font-semibold underline text-yellow-300">📈 Dashboard</a>
+      <a href="profile.php" class="block hover:underline">👤 Profile</a>
     </nav>
   </aside>
 
@@ -26,25 +68,21 @@
     <!-- Topbar -->
     <header class="bg-teal-800 p-4 rounded-lg mb-6 flex justify-between items-center">
       <h2 class="text-xl font-bold">Dashboard</h2>
-      <nav class="space-x-4 text-sm">
-        <a href="#" class="hover:underline">Home</a>
-        <a href="#" class="hover:underline">About</a>
-      </nav>
     </header>
 
     <!-- Cards -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <div class="bg-gray-800 p-6 rounded-lg shadow text-center">
         <h3 class="text-lg font-semibold mb-2">Total Sales</h3>
-        <p class="text-3xl font-bold text-yellow-400">₱15,250</p>
+        <p class="text-3xl font-bold text-yellow-400">₱<?= number_format($totalSales, 2) ?></p>
       </div>
       <div class="bg-gray-800 p-6 rounded-lg shadow text-center">
         <h3 class="text-lg font-semibold mb-2">Total Orders</h3>
-        <p class="text-3xl font-bold text-yellow-400">87</p>
+        <p class="text-3xl font-bold text-yellow-400"><?= $totalOrders ?></p>
       </div>
       <div class="bg-gray-800 p-6 rounded-lg shadow text-center">
         <h3 class="text-lg font-semibold mb-2">Items in Stock</h3>
-        <p class="text-3xl font-bold text-yellow-400">320</p>
+        <p class="text-3xl font-bold text-yellow-400"><?= $totalStock ?></p>
       </div>
     </section>
 
@@ -56,16 +94,16 @@
 
   </main>
 
-  <!-- Chart.js Script -->
+  <!-- Chart Script -->
   <script>
     const ctx = document.getElementById('salesChart').getContext('2d');
     const salesChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        labels: <?= json_encode($days) ?>,
         datasets: [{
           label: '₱ Sales',
-          data: [2000, 2500, 1800, 2200, 3000, 2800, 2900],
+          data: <?= json_encode($totals) ?>,
           borderColor: '#ecc94b',
           backgroundColor: 'rgba(236, 201, 75, 0.2)',
           borderWidth: 2,
@@ -77,31 +115,22 @@
         responsive: true,
         scales: {
           y: {
-            ticks: {
-              color: '#ffffff'
-            },
-            grid: {
-              color: '#4a5568'
-            }
+            ticks: { color: '#ffffff' },
+            grid: { color: '#4a5568' }
           },
           x: {
-            ticks: {
-              color: '#ffffff'
-            },
-            grid: {
-              color: '#4a5568'
-            }
+            ticks: { color: '#ffffff' },
+            grid: { color: '#4a5568' }
           }
         },
         plugins: {
           legend: {
-            labels: {
-              color: '#ffffff'
-            }
+            labels: { color: '#ffffff' }
           }
         }
       }
     });
   </script>
+
 </body>
 </html>

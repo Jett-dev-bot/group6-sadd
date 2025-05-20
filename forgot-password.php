@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Forgot Password | QuickSales</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     * {
       margin: 0;
@@ -12,42 +13,43 @@
     }
 
     body {
-      background-color: #065c64;
-      color: #fff;
-      height: 100vh;
+      background-color: #111827; /* dark slate */
+      color: #ffffff;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      height: 100vh;
     }
 
     .container {
-      width: 100%;
-      max-width: 400px;
-      background-color: #0e7b86;
+      background-color: #1f2937; /* dark gray */
       padding: 40px 30px;
-      border-radius: 20px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      max-width: 400px;
+      width: 100%;
       text-align: center;
     }
 
     .logo {
       font-size: 28px;
       font-weight: bold;
-      margin-bottom: 30px;
-      letter-spacing: 1px;
+      margin-bottom: 20px;
     }
 
     .logo span {
-      color: #ffffff;
+      color: #facc15; /* yellow-300 */
     }
 
     h2 {
-      font-size: 22px;
-      margin-bottom: 10px;
+      font-size: 20px;
+      margin-bottom: 8px;
+      font-weight: 600;
     }
 
     p {
       font-size: 14px;
-      color: #d1d1d1;
+      color: #d1d5db; /* light gray */
       margin-bottom: 25px;
     }
 
@@ -57,10 +59,9 @@
     }
 
     .form-group label {
-      display: block;
       font-size: 14px;
       margin-bottom: 6px;
-      color: #ffffff;
+      display: block;
     }
 
     .form-group input {
@@ -68,54 +69,58 @@
       padding: 12px;
       border: none;
       border-radius: 8px;
-      background-color: #2a2a2a;
-      color: #fff;
+      background-color: #374151; /* dark input */
+      color: white;
     }
 
     .form-group input::placeholder {
-      color: #bbbbbb;
+      color: #9ca3af;
     }
 
     .submit-btn {
       width: 100%;
       padding: 12px;
-      background-color: #48b9d4;
+      background-color: #facc15; /* yellow-300 */
       border: none;
       border-radius: 8px;
-      color: #fff;
+      color: #1f2937; /* dark gray text */
       font-weight: bold;
       cursor: pointer;
       transition: background 0.3s ease;
     }
 
     .submit-btn:hover {
-      background-color: #3aa2ba;
+      background-color: #fbbf24; /* yellow-400 */
     }
 
     .back-link {
       display: block;
       margin-top: 25px;
       font-size: 14px;
-      color: #ffffff;
+      color: #facc15;
       text-decoration: underline;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
+
   <div class="container">
     <div class="logo">QUICK<span>SALES</span></div>
     <h2>Forgot your password?</h2>
     <p>Please enter your username or email to recover your password</p>
 
-    <div class="form-group">
-      <label for="username">Username/Email</label>
-      <input type="text" id="username" placeholder="Enter your username">
-    </div>
+    <form action="#" method="POST">
+      <div class="form-group">
+        <label for="username">Username / Email</label>
+        <input type="text" id="username" name="username" placeholder="Enter your username or email" required>
+      </div>
 
-    <button class="submit-btn">Submit Now</button>
+      <button type="submit" class="submit-btn">Submit Now</button>
+    </form>
 
-    <a href="loginform.php" class="back-link">Back to login</a>
+    <a href="loginform.php" class="back-link">← Back to login</a>
   </div>
+
 </body>
 </html>

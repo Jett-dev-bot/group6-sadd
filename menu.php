@@ -1,9 +1,15 @@
 <?php
 include 'db.php';
 
-// Fetch menu items from the database
+// Nag fe--fetch ng menu items sa the database
 $stmt = $pdo->query("SELECT * FROM menu_items");
 $menuItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Get the next order number
+$stmt = $pdo->query("SELECT MAX(id) AS last_order_id FROM orders");
+$lastOrder = $stmt->fetch(PDO::FETCH_ASSOC);
+$nextOrderId = $lastOrder && $lastOrder['last_order_id'] ? $lastOrder['last_order_id'] + 1 : 1;
+
 ?>
 
 <!DOCTYPE html>
@@ -17,15 +23,15 @@ $menuItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body class="flex bg-gray-900 text-white">
 
   <!-- Sidebar -->
-  <aside class="w-1/5 bg-teal-900 text-white p-4 min-h-screen space-y-6">
-    <h1 class="text-2xl font-bold">QuickSales</h1>
-    <nav class="space-y-2 text-sm">
-      <a href="#" class="block bg-teal-700 rounded px-2 py-1 font-bold text-yellow-300"><strong>MENU</strong></a>
-      <a href="salesreport.php" class="block hover:underline"><strong>SALES REPORT</strong></a>
-      <a href="dashboard.php" class="block hover:underline"><strong>DASHBOARD</strong></a>
-      <a href="profile.php" class="block hover:underline"><strong>PROFILE</strong></a>
-    </nav>
-  </aside>
+    <aside class="w-1/5 bg-teal-900 text-white min-h-screen p-4 space-y-8">
+      <h1 class="text-2xl font-bold mb-6">QuickSales</h1>
+      <nav class="flex flex-col space-y-4 text-base font-medium">
+        <a href="#" class="block font-semibold underline text-yellow-300">📋 Menu</a>
+        <a href="salesreport.php" class="block hover:underline">📈 Sales Report</a>
+        <a href="dashboard.php" class="block hover:underline">🏠 Dashboard</a>
+        <a href="profile.php" class="block hover:underline">👤 Profile</a>
+      </nav>
+    </aside>
 
   <!-- Main Content -->
   <main class="flex-1 flex">
@@ -51,6 +57,7 @@ $menuItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <!-- Order Summary -->
     <section class="w-2/5 bg-gray-800 text-white p-6">
       <div id="order-list" class="mb-6 space-y-2"></div>
+      <div class="text-sm font-semibold mb-2">Order No. #<?= $nextOrderId ?></div>
       <div class="border-t border-gray-400 pt-4 space-y-2 text-sm">
         <div class="flex justify-between"><span>SUBTOTAL</span><span id="subtotal">₱0.00</span></div>
         <div class="flex justify-between"><span>SERVICE CHARGE (10%)</span><span id="service-charge">₱0.00</span></div>
@@ -60,34 +67,35 @@ $menuItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </section>
   </main>
 
-  <!-- Add Item Modal -->
+    <!-- Add Item Modal -->
   <div id="addItemModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
     <div class="bg-white text-black p-6 rounded-lg w-96">
       <h2 class="text-xl font-bold mb-4">Add New Menu Item</h2>
       <form id="addItemForm">
         <div class="mb-3">
-          <label class="block text-sm font-semibold">Image</label>
-          <input type="file" id="itemImage" accept="image/*" required />
+          <label class="block text-sm font-semibold mb-1">Image</label>
+          <input type="file" id="itemImage" accept="image/*" required class="w-full border border-gray-300 rounded px-3 py-2" />
         </div>
         <div class="mb-3">
-          <label class="block text-sm font-semibold">Name</label>
-          <input type="text" id="itemName" required />
+          <label class="block text-sm font-semibold mb-1">Name</label>
+          <input type="text" id="itemName" required class="w-full border border-gray-300 rounded px-3 py-2" />
         </div>
         <div class="mb-3">
-          <label class="block text-sm font-semibold">Price</label>
-          <input type="number" id="itemPrice" required />
+          <label class="block text-sm font-semibold mb-1">Price</label>
+          <input type="number" id="itemPrice" required class="w-full border border-gray-300 rounded px-3 py-2" />
         </div>
         <div class="mb-3">
-          <label class="block text-sm font-semibold">Description</label>
-          <textarea id="itemDescription" rows="3"></textarea>
+          <label class="block text-sm font-semibold mb-1">Description</label>
+          <textarea id="itemDescription" rows="3" class="w-full border border-gray-300 rounded px-3 py-2"></textarea>
         </div>
-        <div class="flex justify-end gap-2">
+        <div class="flex justify-end gap-2 mt-4">
           <button type="button" onclick="closeModal()" class="bg-gray-400 px-4 py-2 rounded">Cancel</button>
           <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Add</button>
         </div>
       </form>
     </div>
   </div>
+
   
   <div id="summaryModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
     <div class="bg-white text-black rounded-lg w-96 p-6">
@@ -108,7 +116,7 @@ $menuItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="bg-white text-black rounded-lg w-96 p-6">
       <h2 class="text-xl font-bold mb-4">Receipt</h2>
       <div id="receiptContent" class="text-sm mb-4"></div>
-      <button onclick="closeReceipt()" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Done</button>
+      <button onclick="closeReceiptAndSubmit()" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Confirm & Done</button>
     </div>
   </div>
 
@@ -124,15 +132,49 @@ $menuItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   <!-- GCash QR Modal -->
   <div id="gcashModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white text-black p-6 rounded-lg w-96 text-center space-y-4">
+    <div class="bg-white text-black p-6 rounded-lg w-96 text-center relative space-y-4">
+      <!-- X button in top-right corner -->
+      <button onclick="closeGcashModal()" class="absolute top-2 right-2 text-gray-600 hover:text-red-500 text-xl font-bold">&times;</button>
+      
       <h2 class="text-lg font-bold mb-2">Scan to Pay via GCash</h2>
-      <img src="gcash_qr.png" alt="GCash QR" class="mx-auto h-48 w-48 border" />
+      <img src="gcash-qr.png" alt="GCash QR" class="mx-auto h-48 w-48 border" />
       <button onclick="confirmPayment()" class="bg-blue-600 text-white px-4 py-2 rounded">Confirm Payment</button>
     </div>
   </div>
 
+  <!-- Empty Order Warning Modal -->
+  <div id="emptyOrderModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white text-black p-6 rounded-lg w-96 text-center">
+      <h2 class="text-lg font-bold mb-4">No items in order</h2>
+      <p class="mb-4">Please add at least one item before proceeding to payment.</p>
+      <button onclick="closeEmptyOrderModal()" class="bg-blue-600 text-white px-4 py-2 rounded">OK</button>
+    </div>
+  </div>
+
+
+
   <script>
     let menuItems = <?php echo json_encode($menuItems); ?>;
+
+
+        function openEmptyOrderModal() {
+      document.getElementById('emptyOrderModal').classList.remove('hidden');
+    }
+
+    function closeEmptyOrderModal() {
+      document.getElementById('emptyOrderModal').classList.add('hidden');
+    }
+
+
+        function closeGcashModal() {
+      document.getElementById('gcashModal').classList.add('hidden');
+    }
+
+        function closeReceiptAndSubmit() {
+      document.getElementById('receiptModal').classList.add('hidden');
+      confirmPayment();
+    }
+
 
     function renderMenu() {
       const menuSection = document.getElementById('menu-items');
@@ -202,8 +244,14 @@ $menuItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     function openPaymentModal() {
+      const orderList = document.querySelectorAll('#order-list div');
+      if (orderList.length === 0) {
+        openEmptyOrderModal();
+        return;
+      }
       document.getElementById('paymentModal').classList.remove('hidden');
     }
+
 
     function closePaymentModal() {
       document.getElementById('paymentModal').classList.add('hidden');
@@ -212,18 +260,51 @@ $menuItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
     function selectPayment(method) {
       closePaymentModal();
       if (method === 'cash') {
-        confirmPayment();
+        showReceiptModal(); // 👈 Show receipt immediately
       } else if (method === 'gcash') {
         document.getElementById('gcashModal').classList.remove('hidden');
       }
     }
+    function showReceiptModal() {
+    const receiptContent = document.getElementById('receiptContent');
+    const orderItems = document.querySelectorAll('#order-list div');
+
+    let receiptHTML = '';
+    let subtotal = 0;
+
+    orderItems.forEach(item => {
+      const name = item.querySelector('span').innerText;
+      const qty = parseInt(item.querySelector('.qty').innerText);
+      const price = parseFloat(item.dataset.price);
+      const total = qty * price;
+      subtotal += total;
+
+      receiptHTML += `<div class="flex justify-between text-sm mb-1">
+                        <span>${qty}x ${name}</span>
+                        <span>₱${total.toFixed(2)}</span>
+                      </div>`;
+    });
+
+    const service = subtotal * 0.10;
+    const grandTotal = subtotal + service;
+
+    receiptHTML += `
+      <hr class="my-2 border-gray-300">
+      <div class="flex justify-between text-sm"><strong>Subtotal</strong><span>₱${subtotal.toFixed(2)}</span></div>
+      <div class="flex justify-between text-sm"><strong>Service Charge (10%)</strong><span>₱${service.toFixed(2)}</span></div>
+      <div class="flex justify-between text-lg font-bold mt-2"><strong>Total</strong><span>₱${grandTotal.toFixed(2)}</span></div>
+    `;
+
+    receiptContent.innerHTML = receiptHTML;
+    document.getElementById('receiptModal').classList.remove('hidden');
+  }
 
     function confirmPayment() {
       document.getElementById('gcashModal').classList.add('hidden');
       submitOrder();
     }
 
-    function submitOrder() {
+        function submitOrder() {
       const orderList = document.querySelectorAll('#order-list div');
       const items = [];
 
@@ -244,17 +325,17 @@ $menuItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
       .then(res => res.json())
       .then(data => {
         if (data.status === 'success') {
-          alert('Order saved! Order ID: ' + data.order_id);
-          document.getElementById('order-list').innerHTML = '';
-          updateTotal();
+          window.location.href = `thankyou.php?order_id=${data.order_id}`;
         } else {
           alert('Failed to save order: ' + data.message);
         }
       })
+
       .catch(err => {
         alert('Error: ' + err);
       });
     }
+
 
     document.getElementById('addItemForm').addEventListener('submit', function (e) {
       e.preventDefault();

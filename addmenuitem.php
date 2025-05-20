@@ -1,21 +1,39 @@
 <?php
 include 'db.php';
 
-$data = json_decode(file_get_contents('php://input'), true);
+$data = json_decode(file_get_contents("php://input"), true);
 
 $name = $data['name'];
 $price = $data['price'];
 $description = $data['description'];
-$image = $data['image']; // Assuming this is the base64 image data
+$imageData = $data['image']; // base64 image
 
-try {
-    // Insert the new menu item into the menu_items table
-    $stmt = $pdo->prepare('INSERT INTO menu_items (name, price, description, image_path) VALUES (?, ?, ?, ?)');
-    $stmt->execute([$name, $price, $description, $image]);
+// Extract image type
+if (preg_match('/^data:image\/(\w+);base64,/', $imageData, $type)) {
+    $imageData = substr($imageData, strpos($imageData, ',') + 1);
+    $type = strtolower($type[1]); // jpg, png, gif
 
-    // Return success message with the inserted item id
-    echo json_encode(['status' => 'success']);
-} catch (Exception $e) {
-    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    if (!in_array($type, ['jpg', 'jpeg', 'png', 'gif'])) {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid image type']);
+        exit;
+    }
+
+    $imageData = base64_decode($imageData);
+    if ($imageData === false) {
+        echo json_encode(['status' => 'error', 'message' => 'Base64 decode failed']);
+        exit;
+    }
+} else {
+    echo json_encode(['status' => 'error', 'message' => 'Invalid image format']);
+    exit;
 }
-?>
+
+// Save image to 'uploads/' folder
+$filename = 'uploads/' . uniqid() . '.' . $type;
+file_put_contents($filename, $imageData);
+
+// Save item to database
+$stmt = $pdo->prepare("INSERT INTO menu_items (name, price, description, image_path) VALUES (?, ?, ?, ?)");
+$stmt->execute([$name, $price, $description, $filename]);
+
+echo json_encode(['status' => 'success']);

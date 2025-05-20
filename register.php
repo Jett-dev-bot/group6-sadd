@@ -1,79 +1,55 @@
+<?php
+$error = $_GET['error'] ?? '';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Register - Point of Sale</title>
-    <style>
-        body {
-            background-color: #062e33;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        .register-container {
-            background-color: #0b4f56;
-            width: 400px;
-            margin: 200px auto;
-            padding: 40px 30px;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
-            color: #ffffff;
-            text-align: center;
-        }
-
-        .register-container h2 {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-
-        .register-container .cart-icon {
-            font-size: 32px;
-            margin-bottom: 20px;
-        }
-
-        .register-container input[type="text"],
-        .register-container input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0 20px;
-            background-color: transparent;
-            border: 1px solid #fff;
-            border-radius: 5px;
-            color: #ffffff;
-        }
-
-        .register-container input::placeholder {
-            color: #ccc;
-        }
-
-        .register-container input[type="submit"] {
-            background-color: #dcdcdc;
-            color: #000;
-            padding: 15px 40px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .register-container input[type="submit"]:hover {
-            background-color: rgb(98, 97, 108);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register - QuickSales POS</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
 </head>
-<body>
+<body class="bg-gray-900 text-white font-sans flex items-center justify-center min-h-screen">
 
-<div class="register-container">
-    <h2>POINT OF SALE</h2>
-    <div class="cart-icon">🛒</div>
-    <form action="actionpage.php" method="POST">
-        <input type="text" name="name" placeholder="Name" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <input type="submit" value="Register">
+  <!-- Register Card -->
+  <div class="bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-md">
+    <h2 class="text-2xl font-bold text-center mb-2">QuickSales</h2>
+    <div class="text-4xl text-center mb-6">🛒</div>
+    
+    <form action="actionpage.php" method="POST" class="space-y-4">
+      <div>
+        <input type="text" name="name" placeholder="Name" required
+          class="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none placeholder-gray-400" />
+      </div>
+      <div>
+        <input type="password" name="password" placeholder="Password" required
+          class="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none placeholder-gray-400" />
+      </div>
+      <div>
+        <input type="submit" value="Register"
+          class="w-full bg-yellow-300 text-gray-900 font-bold py-3 rounded-lg hover:bg-yellow-400 transition" />
+      </div>
     </form>
-</div>
+
+    <p class="text-center text-sm text-gray-300 mt-4">
+      Already have an account?
+      <a href="loginform.php" class="text-yellow-300 font-semibold hover:underline ml-1">Login →</a>
+    </p>
+  </div>
+
+  <!-- Error Modal -->
+  <?php if ($error === 'username'): ?>
+  <div id="errorModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+    <div class="bg-gray-800 text-white p-6 rounded-xl shadow-lg text-center max-w-sm w-full">
+      <h3 class="text-lg font-bold mb-2">⚠️ Username Already Exists</h3>
+      <p class="text-sm text-gray-300">Please choose a different username.</p>
+      <button onclick="document.getElementById('errorModal').style.display='none';"
+        class="mt-4 px-4 py-2 bg-yellow-300 text-gray-900 font-semibold rounded hover:bg-yellow-400 transition">
+        Close
+      </button>
+    </div>
+  </div>
+  <?php endif; ?>
 
 </body>
 </html>

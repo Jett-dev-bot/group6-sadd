@@ -4,188 +4,72 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>My Profile</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: "Segoe UI", sans-serif;
-      background-color: #005c66;
-      color: white;
-    }
-
-    .container {
-      display: flex;
-      height: 100vh;
-    }
-
-    .sidebar {
-      width: 250px;
-      background-color: #2e6972;
-      padding: 20px;
-    }
-
-    .sidebar button {
-      width: 100%;
-      padding: 15px;
-      margin-bottom: 10px;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-      background-color: #447c86;
-      color: white;
-    }
-
-    .sidebar button.active {
-      background-color: #d3f4ea;
-      color: black;
-      font-weight: bold;
-    }
-
-    .main {
-      flex: 1;
-      padding: 40px;
-    }
-
-    .profile-box {
-      background-color: #3b7e8b;
-      padding: 30px;
-      border-radius: 10px;
-      max-width: 700px;
-      margin: auto;
-    }
-
-    .profile-header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .profile-header img {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-    }
-
-    .profile-header h2 {
-      margin: 10px 0 5px;
-    }
-
-    .profile-header p {
-      font-size: 14px;
-      color: #ddd;
-    }
-  
-    label {
-  display: block;
-  margin-top: 15px;
-  margin-bottom: 5px;
-  font-weight: bold;
-  }
-
-  input {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: none;
-  background-color: #2c2c2c;
-  color: white;
-  font-size: 15px;
-  box-sizing: border-box;
-  }
-
-
-  .password-row {
-  display: flex;
-  gap: 10px; 
-  margin-top: 15px;
-}
-
-.password-row > div {
-  flex: 1;
-}
-    .buttons {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 30px;
-    }
-
-    .buttons a, .buttons button {
-      text-decoration: none;
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-size: 16px;
-      border: none;
-      cursor: pointer;
-    }
-
-    .discard-btn {
-      background: none;
-      color: #d3f4ea;
-    }
-
-    .save-btn {
-      background-color: #d3f4ea;
-      color: #003c3c;
-    }
-    .sidebar-button {
-        display: block;
-        padding: 15px;
-        margin-bottom: 10px;
-        border-radius: 10px;
-        font-size: 16px;
-        text-align: center;
-        background-color: #447c86;
-        color: white;
-        text-decoration: none;
-    }
-        .sidebar-button:hover {
-        background-color: #d3f4ea;
-        color: black;
-    }
-
-  </style>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
 </head>
-<body>
-  <div class="container">
-    <div class="sidebar">
-      <button class="active">👤 My Profile</button>
-      <a href="salesreport.php" class="sidebar-button">⚙️ Manage POS</a>
-      <a href="loginform.php" class="sidebar-button">🔓 Logout</a>
-    </div>
-    <div class="main">
-      <div class="profile-box">
-        <div class="profile-header">
-          <img src="unnamed.jpg" alt="Profile Picture">
-          <h2>Sumatra, Justin</h2>
-          <p>Manager</p>
-        </div>
-        <form>
-          <label for="first-name">First Name</label>
-          <input type="text" id="first-name" value="Justin">
+<body class="bg-gray-900 text-white font-sans">
 
-          <label for="email">Email</label>
-          <input type="email" id="email" value="gyatt1234@gmail.com">
+  <!-- Sidebar -->
+  <aside class="fixed top-0 left-0 w-64 h-screen bg-teal-900 shadow-lg p-6">
+    <h1 class="text-2xl font-bold mb-8">QuickSales</h1>
+    <nav class="space-y-4 text-base font-medium">
+      <a href="menu.php" class="block hover:underline">📋 Menu</a>
+      <a href="salesreport.php" class="block hover:underline">📊 Sales Report</a>
+      <a href="dashboard.php" class="block hover:underline">📈 Dashboard</a>
+      <a href="profile.php" class="block font-semibold underline text-yellow-300">👤 Profile</a>
+      <form action="logout.php" method="post">
+        <button type="submit" class="block hover:underline text-red-400">🚪 Logout</button>
+      </form>
+    </nav>
+  </aside>
 
-          <label for="address">Address</label>
-          <input type="text" id="address" value="Barangay Amsic">
+  <!-- Main Content -->
+  <main class="ml-64 p-6">
+    <!-- Header -->
+    <header class="bg-teal-800 p-4 rounded-lg mb-6 flex justify-between items-center">
+      <h2 class="text-xl font-bold">My Profile</h2>
+    </header>
 
-          <div class="password-row">
-            <div>
-              <label for="new-password">New Password</label>
-              <input type="password" id="new-password">
-            </div>
-            <div>
-              <label for="confirm-password">Confirm Password</label>
-              <input type="password" id="confirm-password">
-            </div>
-          </div>
-
-          <div class="buttons">
-            <a href="#" class="discard-btn">Discard Changes</a>
-            <button type="submit" class="save-btn">Save Changes</button>
-          </div>
-        </form>
+    <!-- Profile Form Box -->
+    <section class="bg-gray-800 p-6 rounded-lg shadow max-w-3xl mx-auto">
+      <div class="text-center mb-6">
+        <img src="unnamed.jpg" alt="Profile Picture" class="w-24 h-24 mx-auto rounded-full object-cover mb-2">
+        <h2 class="text-2xl font-bold">Sumatra, Justin</h2>
+        <p class="text-sm text-gray-300">Manager</p>
       </div>
-    </div>
-  </div>
+
+      <form>
+        <div class="mb-4">
+          <label for="first-name" class="block font-semibold mb-1">First Name</label>
+          <input type="text" id="first-name" value="Justin" class="w-full bg-gray-700 text-white p-3 rounded-lg focus:outline-none">
+        </div>
+
+        <div class="mb-4">
+          <label for="email" class="block font-semibold mb-1">Email</label>
+          <input type="email" id="email" value="gyatt1234@gmail.com" class="w-full bg-gray-700 text-white p-3 rounded-lg focus:outline-none">
+        </div>
+
+        <div class="mb-4">
+          <label for="address" class="block font-semibold mb-1">Address</label>
+          <input type="text" id="address" value="Barangay Amsic" class="w-full bg-gray-700 text-white p-3 rounded-lg focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label for="new-password" class="block font-semibold mb-1">New Password</label>
+            <input type="password" id="new-password" class="w-full bg-gray-700 text-white p-3 rounded-lg focus:outline-none">
+          </div>
+          <div>
+            <label for="confirm-password" class="block font-semibold mb-1">Confirm Password</label>
+            <input type="password" id="confirm-password" class="w-full bg-gray-700 text-white p-3 rounded-lg focus:outline-none">
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6">
+          <a href="#" class="text-yellow-300 hover:underline">Discard Changes</a>
+          <button type="submit" class="bg-yellow-300 text-gray-900 font-bold px-6 py-2 rounded-lg hover:bg-yellow-400 transition">Save Changes</button>
+        </div>
+      </form>
+    </section>
+  </main>
 </body>
 </html>

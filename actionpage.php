@@ -28,10 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->store_result();
 
     if ($stmt->num_rows > 0) {
-        echo "Username already exists. <a href='register.php'>Try again</a>";
+        // Redirect back to register page with error flag for modal
+        header("Location: register.php?error=username");
         $stmt->close();
         $conn->close();
-        exit;   
+        exit;
     }
 
     $stmt->close();
@@ -52,4 +53,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     echo "Invalid request.";
 }
-?>
