@@ -53,40 +53,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['name'], $_POST['passwo
   <meta charset="UTF-8" />
   <title>Login | QuickSales POS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="loginform.css">
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center font-sans">
+<body>
 
-  <form method="POST" class="bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-md">
-    <h2 class="text-2xl font-bold text-center mb-2">QuickSales</h2>
-    <div class="text-4xl text-center mb-6">🛒</div>
+  <form method="POST">
+    <h2>QuickSales</h2>
+    <div class="icon">🛒</div>
 
-    <div class="space-y-4">
-      <input type="text" name="name" placeholder="Username" required
-             class="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none placeholder-gray-400" />
+    <input type="text" name="name" placeholder="Username" required />
+    <input type="password" name="password" placeholder="Password" required />
 
-      <input type="password" name="password" placeholder="Password" required
-             class="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none placeholder-gray-400" />
-    </div>
-
-    <div class="text-right mt-2">
-      <a href="forgot-password.php" class="text-sm text-gray-300 hover:text-yellow-300">Forgot password?</a>
+    <div class="forgot">
+      <a href="forgot-password.php">Forgot password?</a>
     </div>
 
     <?php if (!empty($msg)): ?>
-      <div class="bg-red-600 text-white p-2 rounded mt-4 text-sm text-center">
-        <?= htmlspecialchars($msg) ?>
-      </div>
+      <div class="error"><?= htmlspecialchars($msg) ?></div>
     <?php endif; ?>
 
-    <button type="submit" name="login"
-            class="mt-6 w-full bg-yellow-300 text-gray-900 font-bold py-3 rounded-lg hover:bg-yellow-400 transition">
-      Login
-    </button>
+    <button type="submit" name="login">Login</button>
 
-    <p class="text-center text-sm text-gray-300 mt-4">
+    <p>
       Don't have an account?
-      <a href="register.php" class="text-yellow-300 font-semibold hover:underline ml-1">Create one →</a>
+      <a href="register.php">Create one →</a>
     </p>
   </form>
 
