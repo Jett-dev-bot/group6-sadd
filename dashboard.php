@@ -10,7 +10,7 @@ $stmtOrders = $pdo->query("SELECT COUNT(DISTINCT id) FROM orders");
 $totalOrders = $stmtOrders->fetchColumn() ?? 0;
 
 // Items in Stock
-$stmtStock = $pdo->query("SELECT SUM(stock) FROM menu_items");
+$stmtStock = $pdo->query("SELECT COUNT(stock) FROM menu_items");
 $totalStock = $stmtStock->fetchColumn() ?? 0;
 
 // Weekly Sales Data (Past 7 Days)
@@ -24,7 +24,7 @@ $stmtWeekly = $pdo->query("
 ");
 $weeklyData = $stmtWeekly->fetchAll(PDO::FETCH_ASSOC);
 
-// Prepare chart data
+// Prepare ng chart data
 $days = [];
 $totals = [];
 $weekMap = [];
